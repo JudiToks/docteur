@@ -142,7 +142,7 @@ WITH ParametresMaladie AS (
     FROM
         parametre_maladie pm
             JOIN parametre_patient pp ON pm.id_parametre = pp.id_parametre
-    WHERE (10 BETWEEN pm.age_min AND pm.age_max)
+    WHERE (18 BETWEEN pm.age_min AND pm.age_max)
       AND (level BETWEEN  level_min AND level_max)
       AND id_patient = 1
 )
@@ -152,22 +152,33 @@ SELECT
 FROM
     parametre_patient p
         JOIN ParametresMaladie m ON p.id_parametre = m.id_parametre
+WHERE id_patient = 1
 GROUP BY
     p.id_patient, m.id_maladie
 HAVING
-        COUNT(m.id_maladie) = (select count(parametre_maladie.id_maladie) from parametre_maladie where (10 BETWEEN age_min AND age_max) and parametre_maladie.id_maladie = m.id_maladie);
+        COUNT(m.id_maladie) = (select count(parametre_maladie.id_maladie) from parametre_maladie where (18 BETWEEN age_min AND age_max) and parametre_maladie.id_maladie = m.id_maladie);
 
 
 with parametre_medicament_patient as (
     select
-        *
+        pm.id_parametre,
+        id_medicament,
+        efficacite,
+        id_patient,
+        level
     from
         parametre_medicament pm
             join parametre_patient pp on pp.id_parametre = pm.id_parametre
     where pp.id_patient = 1
 )
 select
-    *,
+    id_patient,
+    id_parametre,
+    m.id_medicament,
+    nom,
+    level,
+    efficacite,
+    prix,
     (m.prix * (pmp.level / pmp.efficacite)) as prix_total
 from
     parametre_medicament_patient pmp
@@ -193,3 +204,34 @@ from
         join medicament m on m.id_medicament = pmp.id_medicament
 order by
     prix_total asc;
+
+
+
+-- posibilte 1
+WITH ParametreMedicamentPatient AS (
+    SELECT
+        pm.*,
+        m.nom,
+        m.prix,
+        (pp.level / pm.efficacite) as qte_use,
+        (m.prix * (pp.level / pm.efficacite)) AS prix_total,
+        ROW_NUMBER() OVER (PARTITION BY pm.id_parametre ORDER BY (m.prix * (pp.level / pm.efficacite))) AS row_num
+    FROM
+        parametre_medicament pm
+            JOIN parametre_patient pp ON pm.id_parametre = pp.id_parametre
+            JOIN medicament m ON pm.id_medicament = m.id_medicament
+    WHERE pp.id_patient = 1
+)
+SELECT
+    id_parametre,
+    id_medicament,
+    nom,
+    prix,
+    qte_use,
+    prix_total
+FROM
+    ParametreMedicamentPatient
+WHERE
+        row_num = 1
+ORDER BY
+    id_parametre, prix_total;

@@ -32,11 +32,15 @@ public class ConsultationServlet extends HttpServlet
             List<Medicament_parametre> allMedicamentParametre = Medicament_parametre.getAllMedicamentFromParametre(connection, id_patient);
             List<Medicament_quantite_prix> allMedicamentParametreAvecPrix = Medicament_quantite_prix.getMedicamentTotalUse(connection, allMedicamentParametre);
             List<Medicament_quantite_prix> medicamentParametrePatient = Medicament_quantite_prix.removeDuplicateMedicamentParametres2(allMedicamentParametreAvecPrix);
+            List<Medicament_quantite_prix> valinyList1 = Medicament_quantite_prix.removeDuplicateMedicament(medicamentParametrePatient);
 
             List<Medicament_parametre> listMedicament_medicamentParametrePatient = Medicament_parametre.getAllMedicamentFromParametreEffetSecondaire(connection, medicamentParametrePatient);
             List<Medicament_quantite_prix> listMedicament_medicamentParametrePatientAvecPrix = Medicament_quantite_prix.getMedicamentTotalUse(connection, listMedicament_medicamentParametrePatient);
             List<Medicament_quantite_prix> medicamentParametrePatientEffetSecondaire = Medicament_quantite_prix.removeDuplicateMedicamentParametres2(listMedicament_medicamentParametrePatientAvecPrix);
+            List<Medicament_quantite_prix> valinyList2 = Medicament_quantite_prix.removeDuplicateMedicament(medicamentParametrePatientEffetSecondaire);
+
             medicamentParametrePatient.addAll(medicamentParametrePatientEffetSecondaire);
+            valinyList1.addAll(valinyList2);
 //            for (int i = 0; i < allMedicamentParametreAvecPrix.size(); i++)
 //            {
 //                System.out.println("parametre : "+allMedicamentParametreAvecPrix.get(i).getId_parametre()+" | medicament : "+allMedicamentParametreAvecPrix.get(i).getId_medicament()+" | pu : "+allMedicamentParametreAvecPrix.get(i).getPu());
@@ -47,17 +51,18 @@ public class ConsultationServlet extends HttpServlet
                 System.out.println("    Maladie : "+allMaladiePatient.get(i).getMaladie_name());
             }
             System.out.println("---------------------------------------------------------------------");
-            for (int i = 0; i < medicamentParametrePatient.size(); i++)
+            for (int i = 0; i < valinyList1.size(); i++)
             {
-                String paramatre = Parametre.getParametreById(connection, medicamentParametrePatient.get(i).getId_parametre()).getNom();
-                String maladie = Medicament.getMedicamentById(connection, medicamentParametrePatient.get(i).getId_medicament()).getNom();
-                System.out.println("Parametre : "+paramatre+" | Medicament : "+maladie+" | pu : "+medicamentParametrePatient.get(i).getPu()+" | qte necessaire : "+medicamentParametrePatient.get(i).getQte_medicament()+" | prix total : "+medicamentParametrePatient.get(i).getPrix_total());
+                String paramatre = Parametre.getParametreById(connection, valinyList1.get(i).getId_parametre()).getNom();
+                String maladie = Medicament.getMedicamentById(connection, valinyList1.get(i).getId_medicament()).getNom();
+                System.out.println("Parametre : "+paramatre+" | Medicament : "+maladie+" | pu : "+valinyList1.get(i).getPu()+" | qte necessaire : "+valinyList1.get(i).getQte_medicament()+" | prix total : "+valinyList1.get(i).getPrix_total());
             }
 
 //            setAttribute
             request.setAttribute("age", age);
             request.setAttribute("allMaladiePatient", allMaladiePatient);
             request.setAttribute("medicamentParametrePatient", medicamentParametrePatient);
+            request.setAttribute("valiny", valinyList1);
 
             RequestDispatcher dispatcher = request.getRequestDispatcher("consultation.jsp");
             dispatcher.forward(request, response);

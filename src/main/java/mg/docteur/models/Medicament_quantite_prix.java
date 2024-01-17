@@ -1,10 +1,8 @@
 package mg.docteur.models;
 
 import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.sql.SQLException;
+import java.util.*;
 
 public class Medicament_quantite_prix
 {
@@ -130,4 +128,94 @@ public class Medicament_quantite_prix
         }
         return false;
     }
+
+    public static List<Medicament_quantite_prix> removeDuplicateMedicamentUse(List<Medicament_quantite_prix> allMedicamentParametre) {
+        List<Medicament_quantite_prix> uniqueList = new ArrayList<>();
+
+        for (Medicament_quantite_prix medicamentParametre : allMedicamentParametre) {
+            if (!containsMedicamentId(uniqueList, medicamentParametre.getId_medicament())) {
+                uniqueList.add(medicamentParametre);
+            }
+        }
+
+        return uniqueList;
+    }
+
+    private static boolean containsMedicamentId(List<Medicament_quantite_prix> list, int id) {
+        for (Medicament_quantite_prix medicamentParametre : list) {
+            if (medicamentParametre.getId_medicament() == id) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static List<Medicament_quantite_prix> removeDuplicateMedicament(List<Medicament_quantite_prix> listMedicamentQtePrix)
+    {
+        List<Medicament_quantite_prix> valiny = new ArrayList<>();
+        Map<Integer, Double> maxQteUseMap = new HashMap<>();
+
+        for (Medicament_quantite_prix medicament : listMedicamentQtePrix) {
+            int idMedicament = medicament.getId_medicament();
+            double qteUse = medicament.getQte_medicament();
+
+            if (!maxQteUseMap.containsKey(idMedicament) || qteUse > maxQteUseMap.get(idMedicament)) {
+                maxQteUseMap.put(idMedicament, qteUse);
+                // Supprimer l'ancienne entrée pour le médicament
+                valiny.removeIf(m -> m.getId_medicament() == idMedicament);
+            }
+            // Ajouter la ligne actuelle au résultat
+            valiny.add(medicament);
+        }
+        valiny = removeDuplicateMedicamentUse(valiny);
+        return valiny;
+    }
+
+//    public Medicament_quantite_prix getAllComposition(Connection connection, int id_patient) throws SQLException {
+//        List<List<Medicament_quantite_prix>> args = new ArrayList<>();
+//
+//        for (Parametre_patient pp : Parametre_patient.getParametrePatientByIdPatient(connection, id_patient)) {
+//            args.add(Medicament_quantite_prix.getMedicamentTotalUse(connection, Medicament_parametre.getAllMedicamentFromParametre(connection, pp.id_parametre)));
+//        }
+//
+//        List<Medicament_quantite_prix> allCombinaison = getAllComposition(args);
+//        allCombinaison.sort(Comparator.comparingDouble(Medicament_quantite_prix::getPrix_total));
+//
+//        Medicament_quantite_prix cm = null;
+//
+//        try {
+//            cm = allCombinaison.get(0);
+//        }catch (IndexOutOfBoundsException ignored){}
+//
+//        return cm;
+//    }
+//
+//    public static List<Medicament_quantite_prix> getAllComposition(List<List<Medicament_quantite_prix>> args) {
+//        return getAllComposition(args, 0, null);
+//    }
+//
+//    private static List<Medicament_quantite_prix> getAllComposition(List<List<Medicament_quantite_prix>> args, int currentIndex, Medicament_quantite_prix currentComposition) {
+//        List<Medicament_quantite_prix> compositions = new ArrayList<>();
+//
+//        if (currentIndex == args.size()) {
+//            compositions.add(currentComposition);
+//            return compositions;
+//        }
+//
+//        List<Medicament_quantite_prix> currentFamily = args.get(currentIndex);
+//
+//        for (Medicament_quantite_prix mf : currentFamily) {
+//            List<Medicament_quantite_prix> newComposition = new ArrayList<>();
+//            if (currentComposition != null) {
+//                newComposition = (new ArrayList<>(currentComposition.getMedicamentFrequences()));
+//            } else {
+//                newComposition.setMedicamentFrequences(new ArrayList<>());
+//            }
+//
+//            newComposition.getMedicamentFrequences().add(mf);
+//            compositions.addAll(getAllComposition(args, currentIndex + 1, newComposition));
+//        }
+//
+//        return compositions;
+//    }
 }

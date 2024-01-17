@@ -6,6 +6,7 @@
     int age = (int) request.getAttribute("age");
     List<Maladie_patient> listMaladiePatient = (List<Maladie_patient>) request.getAttribute("allMaladiePatient");
     List<Medicament_quantite_prix> listMedicamentParametre = (List<Medicament_quantite_prix>) request.getAttribute("medicamentParametrePatient");
+    List<Medicament_quantite_prix> medicamentUse = (List<Medicament_quantite_prix>) request.getAttribute("valiny");
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -146,6 +147,49 @@
                                                         <td><%=listMedicamentParametre.get(i).getPrix_total()%></td>
                                                     </tr>
                                                 <% } %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <i class="fas fa-table me-1"></i>
+                                Liste de medicament a acheter
+                            </div>
+                            <div class="card-body">
+                                <div class="datatable-wrapper datatable-loading no-footer sortable searchable fixed-columns">
+                                    <div class="datatable-top">
+                                        <div class="datatable-dropdown">
+                                            <label>
+                                                <select class="datatable-selector"><option value="5">5</option><option value="10" selected="">10</option><option value="15">15</option><option value="20">20</option><option value="25">25</option></select> entries per page
+                                            </label>
+                                        </div>
+                                        <div class="datatable-search">
+                                            <input class="datatable-input" placeholder="Search..." type="search" title="Search within table" aria-controls="datatablesSimple">
+                                        </div>
+                                    </div>
+                                    <div class="datatable-container">
+                                        <table id="datatablesSimple2" class="datatable-table">
+                                            <thead>
+                                            <tr>
+                                                <th data-sortable="true"><a href="#" class="datatable-sorter">Medicament</a></th>
+                                                <th data-sortable="true"><a href="#" class="datatable-sorter">PU</a></th>
+                                                <th data-sortable="true"><a href="#" class="datatable-sorter">Qte necessaire</a></th>
+                                                <th data-sortable="true"><a href="#" class="datatable-sorter">Prix total</a></th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <% for (int i = 0; i < medicamentUse.size(); i++) { %>
+                                            <tr data-index="<%=i%>">
+                                                <td><%=medicamentUse.get(i).getNom_medicament()%></td>
+                                                <td><%=medicamentUse.get(i).getPu()%></td>
+                                                <td><%=medicamentUse.get(i).getQte_medicament()%></td>
+                                                <td><%=medicamentUse.get(i).getPrix_total()%></td>
+                                            </tr>
+                                            <% } %>
                                             </tbody>
                                         </table>
                                     </div>

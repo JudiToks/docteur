@@ -50,7 +50,8 @@ public class Maladie_patient
                 "    m.id_maladie\n" +
                 "FROM\n" +
                 "    parametre_patient p\n" +
-                "        JOIN ParametresMaladie m ON p.id_parametre = m.id_parametre\n" +
+                "        JOIN ParametresMaladie m ON p.id_parametre = m.id_parametre " +
+                "WHERE id_patient = "+id_patient+"\n" +
                 "GROUP BY\n" +
                 "    p.id_patient, id_maladie\n" +
                 "HAVING\n" +
