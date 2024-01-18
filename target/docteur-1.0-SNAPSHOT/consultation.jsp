@@ -4,6 +4,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
     int age = (int) request.getAttribute("age");
+    String nom = (String) request.getAttribute("nom");
     List<Maladie_patient> listMaladiePatient = (List<Maladie_patient>) request.getAttribute("allMaladiePatient");
     List<Medicament_quantite_prix> listMedicamentParametre = (List<Medicament_quantite_prix>) request.getAttribute("medicamentParametrePatient");
     List<Medicament_quantite_prix> medicamentUse = (List<Medicament_quantite_prix>) request.getAttribute("valiny");
@@ -68,7 +69,7 @@
             <%--      container     --%>
             <div class="container-fluid px-4">
                 <br>
-                <h3>Patient : <%=listMaladiePatient.get(0).getPatient_name()%> | Age : <%=age%></h3><hr>
+                <h3>Patient : <%=nom%> | Age : <%=age%></h3><hr>
 
                         <div class="card mb-4">
                             <div class="card-header">
@@ -96,12 +97,14 @@
                                             </tr>
                                             </thead>
                                             <tbody>
+                                            <% if (listMaladiePatient.size() != 0) { %>
                                                 <% for (int i = 0; i < listMaladiePatient.size(); i++) { %>
                                                     <tr data-index="<%=i%>">
                                                         <td><%=i+1%></td>
                                                         <td><%=listMaladiePatient.get(i).getMaladie_name()%></td>
                                                     </tr>
                                                 <% } %>
+                                            <% } %>
                                             </tbody>
                                         </table>
                                     </div>
@@ -138,6 +141,7 @@
                                             </tr>
                                             </thead>
                                             <tbody>
+                                            <% if (listMedicamentParametre.size() != 0) { %>
                                                 <% for (int i = 0; i < listMedicamentParametre.size(); i++) { %>
                                                     <tr data-index="<%=i%>">
                                                         <td><%=listMedicamentParametre.get(i).getNom_parametre()%></td>
@@ -147,6 +151,7 @@
                                                         <td><%=listMedicamentParametre.get(i).getPrix_total()%></td>
                                                     </tr>
                                                 <% } %>
+                                            <% } %>
                                             </tbody>
                                         </table>
                                     </div>
@@ -182,6 +187,7 @@
                                             </tr>
                                             </thead>
                                             <tbody>
+                                            <% if (medicamentUse.size() != 0) { %>
                                             <% for (int i = 0; i < medicamentUse.size(); i++) { %>
                                             <tr data-index="<%=i%>">
                                                 <td><%=medicamentUse.get(i).getNom_medicament()%></td>
@@ -189,6 +195,7 @@
                                                 <td><%=medicamentUse.get(i).getQte_medicament()%></td>
                                                 <td><%=medicamentUse.get(i).getPrix_total()%></td>
                                             </tr>
+                                            <% } %>
                                             <% } %>
                                             </tbody>
                                         </table>

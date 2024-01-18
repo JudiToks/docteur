@@ -167,24 +167,23 @@ public class Medicament_parametre
     public static List<Medicament_parametre> getAllMedicamentFromParametreEffetSecondaire(Connection connection, List<Medicament_quantite_prix> listMedoc) {
         List<Medicament_parametre> valiny = new ArrayList<>();
         boolean isOuvert = false;
-
-        // SQL query using a common table expression (CTE) to retrieve relevant data
         String query = "with parametre_medicament_patient as (\n" +
                 "    select\n" +
                 "        *\n" +
                 "    from\n" +
                 "        parametre_medicament pm\n" +
-                "            join parametre_patient pp on pp.id_parametre = pm.id_parametre\n" +
                 "    where\n" +
-                "            pp.id_parametre in (select effetSecondaire_medicament.id_parametre from effetSecondaire_medicament where id_medicament in (" + String.join(",", Collections.nCopies(listMedoc.size(), "?")) + "))\n" +
+                "        pm.id_parametre in (select effetSecondaire_medicament.id_parametre from effetSecondaire_medicament where id_medicament in (" + String.join(",", Collections.nCopies(listMedoc.size(), "?")) + "))\n" +
                 ")\n" +
                 "select\n" +
-                "    *\n" +
+                "    *,\n" +
+                "    (m.prix * (eSm.efficacite / pmp.efficacite)) as prix_total\n" +
                 "from\n" +
                 "    parametre_medicament_patient pmp\n" +
                 "        join medicament m on m.id_medicament = pmp.id_medicament\n" +
+                "        join effetSecondaire_medicament eSm on pmp.id_parametre = eSm.id_parametre\n" +
                 "order by\n" +
-                "    m.prix desc;";
+                "    prix_total asc;";
 
         try {
             if (connection == null) {
@@ -204,12 +203,11 @@ public class Medicament_parametre
             // Process the result set and populate the list
             while (resultSet.next()) {
                 Medicament_parametre temp = new Medicament_parametre();
-                temp.setId_medicament(resultSet.getInt("id_medicament"));
-                temp.setEfficacite_medicament(resultSet.getDouble("efficacite"));
-                temp.setPu_medicament(resultSet.getDouble("prix"));
-                temp.setId_patient(resultSet.getInt("id_patient"));
-                temp.setId_parametre(resultSet.getInt("id_parametre"));
-                temp.setLevel_parametre(resultSet.getDouble("level"));
+                temp.setId_medicament(resultSet.getInt(1));
+                temp.setEfficacite_medicament(resultSet.getDouble(4));
+                temp.setPu_medicament(resultSet.getDouble(7));
+                temp.setId_parametre(resultSet.getInt(9));
+                temp.setLevel_parametre(resultSet.getDouble(11));
                 valiny.add(temp);
             }
 

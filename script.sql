@@ -44,72 +44,64 @@ create table parametre_patient(
     level double precision
 );
 
-INSERT INTO parametre
-VALUES
-    (default, 'Maux de tête'),
-    (default, 'Toux'),
-    (default, 'Fièvre'),
-    (default, 'Essouflement'),
-    (default, 'Douleur Musculaire');
+INSERT INTO maladie (nom) VALUES
+    ('Grippe'),
+    ('Indigestion'),
+    ('Fatique');
 
-INSERT INTO maladie
-VALUES
-    (default, 'Grippe'),
-    (default, 'Rhume'),
-    (default, 'Migraine'),
-    (default, 'Asthme'),
-    (default, 'Hypertension');
+INSERT INTO parametre (nom) VALUES
+    ('Loha'),
+    ('Tanana'),
+    ('Tenda'),
+    ('lelo'),
+    ('Tongotra'),
+    ('Kibo');
 
-INSERT INTO medicament
-VALUES
-    (DEFAULT, 'Doliprane', 899),
-    (DEFAULT, 'Fervex', 1050),
-    (DEFAULT, 'Omeprazole', 1420),
-    (DEFAULT, 'Amoxicilline', 1000),
-    (DEFAULT, 'Aspirine', 880);
+INSERT INTO medicament (nom, prix) VALUES
+    ('Paracetamol', 200),
+    ('Sirop', 23000),
+    ('Doliprane', 30000),
+    ('MagneB6', 35000);
 
-INSERT INTO parametre_maladie (id_maladie, id_parametre, age_min, age_max, level_min, level_max)
-VALUES
-    (1, 1, 10, 25, 5, 9),
-    (1, 1, 26, 50, 3, 8),
-    (1, 2, 10, 25, 1, 5),
-    (1, 2, 26, 50, 2, 7),
-    (1, 3, 18, 25, 1, 7),
-    (1, 3, 26, 50, 2, 5),
-    (1, 5, 18, 25, 1, 6),
-    (1, 5, 26, 50, 3, 8),
-    (2, 2, 10, 25, 1, 5),
-    (2, 2, 26, 50, 1, 3),
-    (2, 3, 10, 25, 5, 10),
-    (2, 3, 26, 50, 2, 7),
-    (3, 1, 10, 25, 5, 10),
-    (3, 1, 26, 50, 4, 8),
-    (4, 4, 10, 25, 5, 9),
-    (4, 4, 26, 50, 3, 8),
-    (4, 5, 10, 25, 2, 5),
-    (4, 5, 26, 50, 2, 7),
-    (5, 1, 10, 25, 2, 7),
-    (5, 1, 26, 50, 4, 7),
-    (5, 3, 10, 25, 3, 7),
-    (5, 3, 26, 50, 5, 8),
-    (5, 4, 10, 25, 1, 4),
-    (5, 4, 26, 50, 2, 5);
+INSERT INTO parametre_maladie (id_maladie, id_parametre, age_min, age_max, level_min, level_max) VALUES
+    (1, 1, 0, 100, 5, 8),
+    (1, 3, 0, 100, 4, 7),
+    (1, 4, 0, 100, 6, 9),
 
-INSERT INTO parametre_medicament (id_parametre, id_medicament, efficacite)
-VALUES
-    (1, 1, 4),
-    (3, 1, 3),
-    (5, 1, 2),
-    (1, 2, 3),
-    (2, 2, 4),
-    (5, 2, 3),
-    (1, 3, 4),
-    (4, 3, 4),
-    (3, 4, 2),
+    (2, 2, 0, 100, 3, 6),
+    (2, 2, 0, 100, 2, 7),
+    (2, 3, 0, 100, 5, 8),
+    (2, 6, 0, 100, 6, 9),
+
+    (3, 1, 0, 100, 3, 6),
+    (3, 2, 0, 100, 2, 6),
+    (3, 3, 0, 100, 2, 5),
+    (3, 5, 0, 100, 4, 7);
+
+
+
+
+INSERT INTO parametre_medicament (id_parametre, id_medicament, efficacite) VALUES
+    (1, 1, 2),
+    (1, 3, 3),
+    (1, 4, 4),
+
     (2, 4, 3),
-    (1, 5, 3),
-    (5, 5, 3),
-    (3, 5, 3);
+    (2, 2, 1),
+
+    (3, 4, 3),
+    (3, 2, 3),
+
+    (4, 2, 1),
+    (4, 3, 4),
+
+    (5, 2, 2),
+
+    (6, 2, 4);
+
+
+INSERT INTO effetSecondaire_medicament (id_medicament, id_parametre, efficacite) VALUES
+    (2,1,-4);
 
 
 
@@ -192,16 +184,16 @@ with parametre_medicament_patient as (
         *
     from
         parametre_medicament pm
-            join parametre_patient pp on pp.id_parametre = pm.id_parametre
     where
-        pp.id_parametre in (select effetSecondaire_medicament.id_parametre from effetSecondaire_medicament where id_medicament in (1, 2))
+        pm.id_parametre in (select effetSecondaire_medicament.id_parametre from effetSecondaire_medicament where id_medicament in (2, 4))
 )
 select
     *,
-    (m.prix * (pmp.level / pmp.efficacite)) as prix_total
+    (m.prix * (eSm.efficacite / pmp.efficacite)) as prix_total
 from
     parametre_medicament_patient pmp
         join medicament m on m.id_medicament = pmp.id_medicament
+        join effetSecondaire_medicament eSm on pmp.id_parametre = eSm.id_parametre
 order by
     prix_total asc;
 

@@ -27,6 +27,7 @@ public class ConsultationServlet extends HttpServlet
 //            parametre
             int id_patient = Integer.parseInt(request.getParameter("patient"));
             Patient patient = Patient.getPatientById(connection, id_patient);
+            String nom_patient = patient.getNom();
             int age = patient.getAgePatient();
             List<Maladie_patient> allMaladiePatient = Maladie_patient.getMaladiePatient(connection, id_patient, age);
             List<Medicament_parametre> allMedicamentParametre = Medicament_parametre.getAllMedicamentFromParametre(connection, id_patient);
@@ -45,10 +46,13 @@ public class ConsultationServlet extends HttpServlet
 //            {
 //                System.out.println("parametre : "+allMedicamentParametreAvecPrix.get(i).getId_parametre()+" | medicament : "+allMedicamentParametreAvecPrix.get(i).getId_medicament()+" | pu : "+allMedicamentParametreAvecPrix.get(i).getPu());
 //            }
-            System.out.println("Maladie du patient : "+allMaladiePatient.get(0).getPatient_name());
-            for (int i = 0; i < allMaladiePatient.size(); i++)
+            if (allMaladiePatient.size() != 0)
             {
-                System.out.println("    Maladie : "+allMaladiePatient.get(i).getMaladie_name());
+                System.out.println("Maladie du patient : "+allMaladiePatient.get(0).getPatient_name());
+                for (int i = 0; i < allMaladiePatient.size(); i++)
+                {
+                    System.out.println("    Maladie : "+allMaladiePatient.get(i).getMaladie_name());
+                }
             }
             System.out.println("---------------------------------------------------------------------");
             for (int i = 0; i < valinyList1.size(); i++)
@@ -59,6 +63,7 @@ public class ConsultationServlet extends HttpServlet
             }
 
 //            setAttribute
+            request.setAttribute("nom", nom_patient);
             request.setAttribute("age", age);
             request.setAttribute("allMaladiePatient", allMaladiePatient);
             request.setAttribute("medicamentParametrePatient", medicamentParametrePatient);
