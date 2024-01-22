@@ -225,4 +225,59 @@ public class Medicament_parametre
 
         return valiny;
     }
+
+    public static List<Integer> checkMedicamentEffetSecondaire(Connection connection, List<Medicament_quantite_prix> listMedoc)
+    {
+        List<Integer> valiny = new ArrayList<>();
+        List<Integer> real = new ArrayList<>();
+        boolean isOuvert = false;
+        String query = "select effetSecondaire_medicament.id_medicament from effetSecondaire_medicament where id_medicament in (" + String.join(",", Collections.nCopies(listMedoc.size(), "?")) + ")\n";
+
+        try {
+            if (connection == null) {
+                connection = Connect.connectToPostgre();
+                isOuvert = true;
+            }
+
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+
+            // Set parameters for the prepared statement
+            for (int i = 0; i < listMedoc.size(); i++) {
+                preparedStatement.setInt(i + 1, listMedoc.get(i).getId_medicament());
+            }
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            // Process the result set and populate the list
+            while (resultSet.next())
+            {
+                Medicament_parametre temp = new Medicament_parametre();
+                temp.setId_medicament(resultSet.getInt(1));
+                valiny.add(temp.getId_medicament());
+            }
+            for (int i = 0; i < listMedoc.size(); i++)
+            {
+                for (int j = 0; j < valiny.size(); j++)
+                {
+                    if (listMedoc.get(i).getId_medicament() == valiny.get(j))
+                    {
+                        real.add(valiny.get(j));
+                    }
+                }
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+            // Close the connection if it was opened within this method
+            if (isOuvert) {
+                connection.close();
+            }
+        } catch (Exception e) {
+            System.out.println("Medicament_parametre checkMedicamentEffetSecondaire issue !");
+            e.printStackTrace();
+        }
+
+        return real;
+    }
 }

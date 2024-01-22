@@ -35,8 +35,23 @@ public class ConsultationServlet extends HttpServlet
             List<Medicament_quantite_prix> medicamentParametrePatient = Medicament_quantite_prix.removeDuplicateMedicamentParametres2(allMedicamentParametreAvecPrix);
             List<Medicament_quantite_prix> valinyList1 = Medicament_quantite_prix.removeDuplicateMedicament(medicamentParametrePatient);
 
-            List<Medicament_parametre> listMedicament_medicamentParametrePatient = Medicament_parametre.getAllMedicamentFromParametreEffetSecondaire(connection, medicamentParametrePatient);
+            List<Medicament_parametre> listMedicament_medicamentParametrePatient = Medicament_parametre.getAllMedicamentFromParametreEffetSecondaire(connection, valinyList1);
             List<Medicament_quantite_prix> listMedicament_medicamentParametrePatientAvecPrix = Medicament_quantite_prix.getMedicamentTotalUse(connection, listMedicament_medicamentParametrePatient);
+            List<Integer> listId_medicament = Medicament_parametre.checkMedicamentEffetSecondaire(connection, valinyList1);
+            for (int i = 0; i < listId_medicament.size(); i++)
+            {
+                for (int j = 0; j < valinyList1.size(); j++)
+                {
+                    if (listId_medicament.get(i) == valinyList1.get(j).getId_medicament())
+                    {
+                        for (int k = 0; k < listMedicament_medicamentParametrePatientAvecPrix.size(); k++)
+                        {
+                            listMedicament_medicamentParametrePatientAvecPrix.get(k).setQte_medicament(listMedicament_medicamentParametrePatientAvecPrix.get(k).getQte_medicament() * valinyList1.get(j).getQte_medicament());
+                            listMedicament_medicamentParametrePatientAvecPrix.get(k).setPrix_total(listMedicament_medicamentParametrePatientAvecPrix.get(k).getPu() * listMedicament_medicamentParametrePatientAvecPrix.get(k).getQte_medicament());
+                        }
+                    }
+                }
+            }
             List<Medicament_quantite_prix> medicamentParametrePatientEffetSecondaire = Medicament_quantite_prix.removeDuplicateMedicamentParametres2(listMedicament_medicamentParametrePatientAvecPrix);
             List<Medicament_quantite_prix> valinyList2 = Medicament_quantite_prix.removeDuplicateMedicament(medicamentParametrePatientEffetSecondaire);
 
